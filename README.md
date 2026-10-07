@@ -66,26 +66,26 @@ This project was built from scratch using **C++20**. It leverages:
 ```mermaid
 flowchart TD
     User([User Application]) -->|Put / Erase| WAL[(Write-Ahead Log)]
-    User -->|Put / Erase| MemTable[Active MemTable <br/>(Skip-List)]
+    User -->|Put / Erase| MemTable["Active MemTable <br/>(Skip-List)"]
     User -->|Get| ReadPath{Search Sequence}
 
     %% Write Path
     WAL -->|Crash Recovery| MemTable
-    MemTable -.->|Size > Threshold| ImmMemTable[Immutable MemTable]
+    MemTable -.->|Size > Threshold| ImmMemTable["Immutable MemTable"]
     
     subgraph Background Thread
         Compactor((Compactor))
         ImmMemTable -->|Flush| Compactor
-        Compactor -->|Write| SST0[Level 0 SSTables]
-        SST0 -->|Compact| SST1[Level 1 SSTables]
+        Compactor -->|Write| SST0["Level 0 SSTables"]
+        SST0 -->|Compact| SST1["Level 1 SSTables"]
     end
 
     %% Read Path
     ReadPath -->|1. Check| MemTable
     ReadPath -->|2. Check| ImmMemTable
-    ReadPath -->|3. Check| Cache[LRU Block Cache]
-    Cache -->|Miss| Index[Sparse Index & <br/>Bloom Filter]
-    Index -->|May Exist| Disk[SSTables on Disk]
+    ReadPath -->|3. Check| Cache["LRU Block Cache"]
+    Cache -->|Miss| Index["Sparse Index & <br/>Bloom Filter"]
+    Index -->|May Exist| Disk["SSTables on Disk"]
     Disk -->|Read Block| Cache
 ```
 
